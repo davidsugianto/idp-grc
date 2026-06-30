@@ -1,0 +1,89 @@
+# Contract: GitHubRunner Custom Resource Schema
+#
+# This document defines the public interface of the GitHubRunner custom resource.
+# It is the contract between the operator and its users.
+# Kubernetes CRD validation schema is generated from the Go types using kubebuilder markers;
+# this file documents the intended schema for planning and review purposes.
+
+apiVersion: idp.grc.io/v1alpha1
+kind: GitHubRunner
+metadata:
+  name: <runner-name>             # required; must be a valid DNS label
+  namespace: <namespace>          # required; runner Pod is created in the same namespace
+
+spec:
+  # REQUIRED: Full GitHub URL of the target repository or organization.
+  # Repository format:    https://github.com/<owner>/<repo>
+  # Organization format:  https://github.com/<org>
+  githubURL: "https://github.com/myorg/myrepo"
+
+  # REQUIRED: Reference to a Kubernetes Secret in the same namespace containing
+  # the GitHub Personal Access Token under the key `token`.
+  credentialsSecretRef:
+    name: <secret-name>
+
+  # OPTIONAL: Display name for the runner in the GitHub UI.
+  # Default: "<namespace>-<cr-name>"
+  # runnerName: my-k8s-runner
+
+  # OPTIONAL: Additional labels to assign the runner in GitHub.
+  # Default: none (runner receives no custom labels)
+  # runnerLabels:
+  #   - kubernetes
+  #   - production
+
+  # OPTIONAL: Runner group to assign the runner to.
+  # Default: "Default"
+  # runnerGroup: "my-group"
+
+  # OPTIONAL: Runner container image.
+  # Default: ghcr.io/actions/runner:latest
+  # image: ghcr.io/actions/runner:2.317.0
+
+  # OPTIONAL: Resource requests and limits for the runner Pod.
+  # Default: no requests or limits set (cluster defaults apply)
+  # resources:
+  #   requests:
+  #     cpu: "500m"
+  #     memory: "512Mi"
+  #   limits:
+  #     cpu: "2"
+  #     memory: "2Gi"
+
+status:
+  # Lifecycle phase. One of: Pending | Registering | Running | Failed | Terminating
+  # Set by the controller; never set by the user.
+  phase: Running
+
+  # GitHub-assigned integer ID for this runner. Used internally for de-registration.
+  # Set after successful registration. Zero if not yet registered.
+  runnerID: 12345678
+
+  # Actual runner name registered with GitHub.
+  runnerName: default-my-runner
+
+  # Name of the runner Pod managed by this CR.
+  podName: my-runner-runner
+
+  # Timestamp of the last successful GitHub registration.
+  registeredAt: "2026-06-30T12:00:00Z"
+
+  # Standard Kubernetes conditions reflecting controller observations.
+  conditions:
+    - type: Registered
+      status: "True"           # "True" | "False" | "Unknown"
+      reason: RegistrationSucceeded
+      message: "Runner registered with GitHub as runner ID 12345678"
+      lastTransitionTime: "2026-06-30T12:00:00Z"
+
+    - type: PodReady
+      status: "True"
+      reason: PodIsReady
+      message: "Runner Pod my-runner-runner is Ready"
+      lastTransitionTime: "2026-06-30T12:01:00Z"
+
+    - type: Degraded
+      status: "False"
+      reason: NoErrors
+      message: ""
+      lastTransitionTime: "2026-06-30T12:00:00Z"
