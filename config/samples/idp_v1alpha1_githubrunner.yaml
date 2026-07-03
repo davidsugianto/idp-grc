@@ -1,0 +1,35 @@
+apiVersion: idp.grc.io/v1alpha1
+kind: GitHubRunner
+metadata:
+  name: my-runner
+  namespace: default
+spec:
+  # githubURL: the repository or organization to register this runner with.
+  # Repository format: https://github.com/<owner>/<repo>
+  # Organization format: https://github.com/<org>
+  githubURL: "https://github.com/YOUR_ORG/YOUR_REPO"
+
+  # credentialsSecretRef: name of a Secret in the same namespace containing your GitHub PAT.
+  # Create with: kubectl create secret generic github-pat --from-literal=token=<YOUR_PAT>
+  credentialsSecretRef:
+    name: github-pat
+
+  # runnerLabels: optional labels visible in GitHub Actions workflow files as `runs-on`.
+  runnerLabels:
+    - kubernetes
+    - self-hosted
+
+  # runnerGroup: optional runner group (organization runners only).
+  # runnerGroup: ""
+
+  # image: runner container image. Defaults to ghcr.io/actions/runner:latest.
+  # image: "ghcr.io/actions/runner:latest"
+
+  # resources: optional CPU/memory requests and limits.
+  # resources:
+  #   requests:
+  #     cpu: "100m"
+  #     memory: "128Mi"
+  #   limits:
+  #     cpu: "500m"
+  #     memory: "512Mi"
