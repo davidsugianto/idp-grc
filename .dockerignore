@@ -1,0 +1,10 @@
+.git/
+bin/
+testbin/
+specs/
+*.md
+*.test
+*.out
+cover.out
+.specify/
+.claude/
